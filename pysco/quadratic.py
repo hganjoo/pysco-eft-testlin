@@ -77,12 +77,12 @@ def operator(
                 
                 pins = pi[-1 + i,j,k] + pi[i,-1 + j,k] + pi[i,j,-1 + k] + pi[i,j,1 + k] + pi[i,1 + j,k] + pi[1 + i,j,k]
                 
-                av = (-six*C4)/(h4 * aH2)
+                av = 0.
 
                 lin = (alphaB*(six*alphaB - two*six*alphaM) + six*C2)/h2
-                nlin = -eight*pins/(h4)
+                #nlin = -eight*pins/(h4)
                 
-                bv = lin - onebyfour*C4*nlin/(aH2)
+                bv = lin
 
                 '''lin = (
                     2*onebyfour*(a**2*(-alphaB + alphaM )*b[i,j,k])/M**2 
@@ -95,15 +95,15 @@ def operator(
                 )
 
                 # Coeff of pi^0 in Q2[pi,pi]
-                q2offd = -onebyeight*((pi[i,-1 + j,-1 + k] - pi[i,-1 + j,1 + k] - pi[i,1 + j,-1 + k] + pi[i,1 + j,1 + k])**2 
+                '''q2offd = -onebyeight*((pi[i,-1 + j,-1 + k] - pi[i,-1 + j,1 + k] - pi[i,1 + j,-1 + k] + pi[i,1 + j,1 + k])**2 
                 - 16.*((pi[i,j,-1 + k] + pi[i,j,1 + k])*(pi[i,-1 + j,k] + pi[i,1 + j,k]) + pi[-1 + i,j,k]*(pi[i,-1 + j,k] + pi[i,j,-1 + k] + pi[i,j,1 + k] + pi[i,1 + j,k]) + (pi[i,-1 + j,k] + pi[i,j,-1 + k] + pi[i,j,1 + k] + pi[i,1 + j,k])*pi[1 + i,j,k]) 
                 + (pi[-1 + i,j,-1 + k] - pi[-1 + i,j,1 + k] - pi[1 + i,j,-1 + k] + pi[1 + i,j,1 + k])**2 
-                + (pi[-1 + i,-1 + j,k] - pi[-1 + i,1 + j,k] - pi[1 + i,-1 + j,k] + pi[1 + i,1 + j,k])**2)/(h4)
+                + (pi[-1 + i,-1 + j,k] - pi[-1 + i,1 + j,k] - pi[1 + i,-1 + j,k] + pi[1 + i,1 + j,k])**2)/(h4)'''
 
-                cv = lin - onebyfour*C4*q2offd/(aH2)
+                cv = lin 
 
 
-                result[i,j,k] = av*pi[i,j,k]**2 + bv*pi[i,j,k] + cv
+                result[i,j,k] = bv*pi[i,j,k] + cv
     
     return result
 
@@ -170,12 +170,13 @@ def solution_quadratic_equation(
     
     pins = pi[-1 + x,y,z] + pi[x,-1 + y,z] + pi[x,y,-1 + z] + pi[x,y,1 + z] + pi[x,1 + y,z] + pi[1 + x,y,z]
     
-    av = (-six*C4)/(h4 * aH2) # goes to zero for linear
+    #av = (-six*C4)/(h4 * aH2) # goes to zero for linear
+    av = 0
 
     lin = (alphaB*(six*alphaB - two*six*alphaM) + six*C2)/h2
-    nlin = -eight*pins/(h4) # goes to zero for linear
+    #nlin = -eight*pins/(h4) # goes to zero for linear
     
-    bv = lin - onebyfour*C4*nlin/(aH2)
+    bv = lin
 
     '''lin = (
         2*onebyfour*(a**2*(-alphaB + alphaM )*b)/M**2 
@@ -188,12 +189,12 @@ def solution_quadratic_equation(
                 )
 
     # Coeff of pi^0 in Q2[pi,pi] goes to zero for linear
-    q2offd = -onebyeight*((pi[x,-1 + y,-1 + z] - pi[x,-1 + y,1 + z] - pi[x,1 + y,-1 + z] + pi[x,1 + y,1 + z])**2 
+    '''q2offd = -onebyeight*((pi[x,-1 + y,-1 + z] - pi[x,-1 + y,1 + z] - pi[x,1 + y,-1 + z] + pi[x,1 + y,1 + z])**2 
     - 16.*((pi[x,y,-1 + z] + pi[x,y,1 + z])*(pi[x,-1 + y,z] + pi[x,1 + y,z]) + pi[-1 + x,y,z]*(pi[x,-1 + y,z] + pi[x,y,-1 + z] + pi[x,y,1 + z] + pi[x,1 + y,z]) + (pi[x,-1 + y,z] + pi[x,y,-1 + z] + pi[x,y,1 + z] + pi[x,1 + y,z])*pi[1 + x,y,z]) 
     + (pi[-1 + x,y,-1 + z] - pi[-1 + x,y,1 + z] - pi[1 + x,y,-1 + z] + pi[1 + x,y,1 + z])**2 
-    + (pi[-1 + x,-1 + y,z] - pi[-1 + x,1 + y,z] - pi[1 + x,-1 + y,z] + pi[1 + x,1 + y,z])**2)/(h4)
+    + (pi[-1 + x,-1 + y,z] - pi[-1 + x,1 + y,z] - pi[1 + x,-1 + y,z] + pi[1 + x,1 + y,z])**2)/(h4)'''
 
-    cv = lin - onebyfour*C4*q2offd/(aH2)
+    cv = lin
 
     '''if bv*bv - 4*av*cv < 0:
         print('Cvals:',av,bv,cv,bv**2 - 4*av*cv)'''
@@ -207,14 +208,8 @@ def solution_quadratic_equation(
     else:
         qsol = -0.5*bv/av'''
     
-    if av == 0:
-        return -cv/bv
     
-
-    dterm = bv**2 - 4*av*cv
-    qsol =  (-bv - np.sqrt(dterm)) / (two*av)
-
-    return qsol
+    return -1.*cv/bv
 
 
 @njit(
