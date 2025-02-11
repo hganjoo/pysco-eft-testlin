@@ -436,7 +436,7 @@ def get_additional_field(
 
             chi = additional_field
             print('Chi:')
-            chi = multigrid.FAS(chi, dens_term, h, param)
+            chi = multigrid.linear(chi, dens_term, h, param)
             #quadratic.smoothing(chi,dens_term,h,param['C2'],param['C4'],param['alphaB'],param['alphaM'],param['H'],param['aexp'],6)
             return chi
 

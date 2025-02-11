@@ -129,7 +129,7 @@ def residual(
     parallel=True,
 )
 def restrict_residual(
-    x: npt.NDArray[np.float32], b: npt.NDArray[np.float32], h: np.float32
+    x: npt.NDArray[np.float32], b: npt.NDArray[np.float32], h: np.float32, 
 ) -> npt.NDArray[np.float32]:
     """Restriction operator on half of the residual of Laplacian operator \\
     residual = -(Ax - b)  \\
