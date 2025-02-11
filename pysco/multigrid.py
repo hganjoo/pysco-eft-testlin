@@ -142,11 +142,6 @@ def FAS(
     # Main procedure: Multigrid
     
     logging.info("Start Full-Approximation Storage Multigrid")
-    residual_error_tmp = residual_error(x, b, h, param)
-    logging.info(f"{residual_error_tmp=} {tolerance=}")
-    F_cycle_FAS(x, b, param)
-    residual_error_tmp = residual_error(x, b, h, param)
-    logging.info(f"{residual_error_tmp=} {tolerance=}")
     F_cycle_FAS(x, b, param)
     residual_error_tmp = residual_error(x, b, h, param)
     logging.info(f"{residual_error_tmp=} {tolerance=}")
