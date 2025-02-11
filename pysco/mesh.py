@@ -1209,6 +1209,129 @@ def derivative7_fR_n1(
                 )
     return result
 
+@utils.time_me
+@njit(
+    ["f4[:,:,:,::1](f4[:,:,::1], f4[:,:,::1], f4)"],
+    fastmath=True,
+    cache=True,
+    parallel=True,
+)
+def derivative7_eft(
+    a: npt.NDArray[np.float32],
+    b: npt.NDArray[np.float32],
+    f: np.float32,
+) -> npt.NDArray[np.float32]:
+    """Spatial derivatives of a scalar field on a grid
+
+    Seven-point stencil derivative with finite differences
+
+    grad(a) + f*grad(b) // For EFT
+
+    Parameters
+    ----------
+    a : npt.NDArray[np.float32]
+        Field [N_cells_1d, N_cells_1d, N_cells_1d]
+    b : npt.NDArray[np.float32]
+        Additional Field [N_cells_1d, N_cells_1d, N_cells_1d]
+    f : np.float32
+        Multiplicative factor to additional field
+
+    Returns
+    -------
+    npt.NDArray[np.float32]
+        Field derivative [N_cells_1d, N_cells_1d, N_cells_1d, 3]
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from pysco.mesh import derivative7_fR_n1
+    >>> a = np.random.rand(32, 32, 32).astype(np.float32)
+    >>> b = np.random.rand(32, 32, 32).astype(np.float32)
+    >>> f = np.float32(2)
+    >>> deriv = derivative7_eft(a, b, f)
+    """
+    nine = np.float32(9)
+    fortyfive = np.float32(45)
+    ncells_1d = a.shape[0]
+    inv60h = np.float32(ncells_1d / 60.0)
+    result = np.empty((ncells_1d, ncells_1d, ncells_1d, 3), dtype=np.float32)
+
+    for i in prange(-3, ncells_1d - 3):
+        ip1 = i + 1
+        im1 = i - 1
+        ip2 = i + 2
+        im2 = i - 2
+        ip3 = i + 3
+        im3 = i - 3
+        for j in prange(-3, ncells_1d - 3):
+            jp1 = j + 1
+            jm1 = j - 1
+            jp2 = j + 2
+            jm2 = j - 2
+            jp3 = j + 3
+            jm3 = j - 3
+            for k in prange(-3, ncells_1d - 3):
+                kp1 = k + 1
+                km1 = k - 1
+                kp2 = k + 2
+                km2 = k - 2
+                kp3 = k + 3
+                km3 = k - 3
+                result[i, j, k, 0] = inv60h * (
+                    fortyfive
+                    * (
+                        -a[im1, j, k]
+                        + a[ip1, j, k]
+                        + f * (-b[im1, j, k] + b[ip1, j, k])
+                    )
+                    + nine
+                    * (
+                        +a[im2, j, k]
+                        - a[ip2, j, k]
+                        + f * (b[im2, j, k] - b[ip2, j, k])
+                    )
+                    - a[im3, j, k]
+                    + a[ip3, j, k]
+                    + f * (-b[im3, j, k] + b[ip3, j, k])
+                )
+
+                result[i, j, k, 1] = inv60h * (
+                    fortyfive
+                    * (
+                        -a[i, jm1, k]
+                        + a[i, jp1, k]
+                        + f * (-b[i, jm1, k] + b[i, jp1, k])
+                    )
+                    + nine
+                    * (
+                        +a[i, jm2, k]
+                        - a[i, jp2, k]
+                        + f * (b[i, jm2, k] - b[i, jp2, k])
+                    )
+                    - a[i, jm3, k]
+                    + a[i, jp3, k]
+                    + f * (-b[i, jm3, k] + b[i, jp3, k])
+                )
+                result[i, j, k, 2] = inv60h * (
+                    fortyfive
+                    * (
+                        -a[i, j, km1]
+                        + a[i, j, kp1]
+                        + f * (-b[i, j, km1] + b[i, j, kp1])
+                    )
+                    + nine
+                    * (
+                        +a[i, j, km2]
+                        - a[i, j, kp2]
+                        + f * (b[i, j, km2] - b[i, j, kp2])
+                    )
+                    - a[i, j, km3]
+                    + a[i, j, kp3]
+                    + f * (-b[i, j, km3] + b[i, j, kp3])
+                )
+    return result
+
+
 
 @utils.time_me
 @njit(
@@ -1691,6 +1814,102 @@ def derivative5_fR_n2(
                     + a[i, j, km2]
                     - a[i, j, kp2]
                     + f * (b[i, j, km2] ** 3 - b[i, j, kp2] ** 3)
+                )
+    return result
+
+
+@utils.time_me
+@njit(
+    ["f4[:,:,:,::1](f4[:,:,::1], f4[:,:,::1], f4)"],
+    fastmath=True,
+    cache=True,
+    parallel=True,
+)
+def derivative5_eft(
+    a: npt.NDArray[np.float32],
+    b: npt.NDArray[np.float32],
+    f: np.float32,
+) -> npt.NDArray[np.float32]:
+    """Spatial derivatives of a scalar field on a grid
+
+    Five-point stencil derivative with finite differences
+
+    grad(a) + f*grad(b) // For EFT
+
+    Parameters
+    ----------
+    a : npt.NDArray[np.float32]
+        Field [N_cells_1d, N_cells_1d, N_cells_1d]
+    b : npt.NDArray[np.float32]
+        Additional Field [N_cells_1d, N_cells_1d, N_cells_1d]
+    f : np.float32
+        Multiplicative factor to additional field
+
+    Returns
+    -------
+    npt.NDArray[np.float32]
+        Field derivative [N_cells_1d, N_cells_1d, N_cells_1d, 3]
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from pysco.mesh import derivative5_fR_n2
+    >>> a = np.random.rand(32, 32, 32).astype(np.float32)
+    >>> b = np.random.rand(32, 32, 32).astype(np.float32)
+    >>> f = np.float32(2)
+    >>> deriv = derivative5_eft(a, b, f)
+    """
+    eight = np.float32(8)
+    ncells_1d = a.shape[0]
+    inv12h = np.float32(ncells_1d / 12.0)
+    result = np.empty((ncells_1d, ncells_1d, ncells_1d, 3), dtype=np.float32)
+    for i in prange(-2, ncells_1d - 2):
+        ip1 = i + 1
+        im1 = i - 1
+        ip2 = i + 2
+        im2 = i - 2
+        for j in prange(-2, ncells_1d - 2):
+            jp1 = j + 1
+            jm1 = j - 1
+            jp2 = j + 2
+            jm2 = j - 2
+            for k in prange(-2, ncells_1d - 2):
+                kp1 = k + 1
+                km1 = k - 1
+                kp2 = k + 2
+                km2 = k - 2
+                result[i, j, k, 0] = inv12h * (
+                    eight
+                    * (
+                        -a[im1, j, k]
+                        + a[ip1, j, k]
+                        + f * (-b[im1, j, k] + b[ip1, j, k])
+                    )
+                    + a[im2, j, k]
+                    - a[ip2, j, k]
+                    + f * (b[im2, j, k] - b[ip2, j, k])
+                )
+                result[i, j, k, 1] = inv12h * (
+                    eight
+                    * (
+                        -a[i, jm1, k]
+                        + a[i, jp1, k]
+                        + f * (-b[i, jm1, k] + b[i, jp1, k])
+                    )
+                    + a[i, jm2, k]
+                    - a[i, jp2, k]
+                    + f * (b[i, jm2, k] - b[i, jp2, k])
+                )
+                result[i, j, k, 2] = inv12h * (
+                    eight
+                    * (
+                        -a[i, j, km1]
+                        + a[i, j, kp1]
+                        + f * (-b[i, j, km1] + b[i, j, kp1])
+                    )
+                    + a[i, j, km2]
+                    - a[i, j, kp2]
+                    + f * (b[i, j, km2] - b[i, j, kp2])
                 )
     return result
 

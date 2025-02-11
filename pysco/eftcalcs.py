@@ -22,6 +22,8 @@ def geteft(
 
     om_m = param["Om_m"]
     om_ma = om_m / (om_m + (1-om_m)*a**3)
+    #alphaB = alphaB0*(1 - om_ma) / (1 - om_m)
+    #alphaM = alphaM0*(1 - om_ma) / (1 - om_m)
     alphaB = alphaB0
     alphaM = alphaM0
     HdotbyH2 = -1.5*om_ma

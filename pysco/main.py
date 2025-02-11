@@ -91,8 +91,8 @@ def run(param) -> None:
         extra += f"_mu0_{param['parametrized_mu0']}"
     extra += f"_{param['linear_newton_solver']}_ncoarse{param['ncoarse']}"
     param["extra"] = extra
-    #z_out = ast.literal_eval(param["z_out"])
-    z_out = np.arange(6,-0.1,-0.1)
+    z_out = ast.literal_eval(param["z_out"])
+    #z_out = np.arange(6,-0.1,-0.1)
 
     power_directory = f"{param['base']}/power"
     os.makedirs(power_directory, exist_ok=True)

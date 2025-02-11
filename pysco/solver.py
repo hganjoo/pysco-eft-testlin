@@ -198,12 +198,8 @@ def pm(
             )
 
     elif "eft" == param["theory"].casefold():
-        c2 = np.float32(
-            -1.0
-            * (c.value * 1e-3 * param["unit_t"] / (param["unit_l"] * param["aexp"]))
-            ** 2)
-        prefac = -1*(param["alphaB"] - param["alphaM"])
-        force = mesh.derivative_eft(
+        prefac = (param["alphaB"] - param["alphaM"])
+        force = mesh.derivative5_eft(
             potential,
             additional_field,
             prefac
@@ -294,7 +290,17 @@ def initialise_potential(
         else:
             minus_one_sixth_h2 = np.float32(-(h**2) / 6)
             potential = utils.prod_vector_scalar(rhs, minus_one_sixth_h2)
+    
     else:
+        if param["theory"].casefold() == "eft":
+            print('Scaling chi...')
+            scaling = (
+                param["aexp"]
+                * tables[3](np.log(param["aexp"]))
+                / (param["aexp_old"] * tables[3](np.log(param["aexp_old"])))
+            )
+            utils.prod_vector_scalar_inplace(potential, scaling)
+
         logging.info("Rescale potential from previous step for Newtonian potential")
         if not param["compute_additional_field"]:
             scaling = (
@@ -429,6 +435,7 @@ def get_additional_field(
 
 
             chi = additional_field
+            print('Chi:')
             chi = multigrid.FAS(chi, dens_term, h, param)
             #quadratic.smoothing(chi,dens_term,h,param['C2'],param['C4'],param['alphaB'],param['alphaM'],param['H'],param['aexp'],6)
             return chi

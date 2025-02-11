@@ -140,7 +140,13 @@ def FAS(
         tolerance = param["tolerance"]
 
     # Main procedure: Multigrid
+    
     logging.info("Start Full-Approximation Storage Multigrid")
+    residual_error_tmp = residual_error(x, b, h, param)
+    logging.info(f"{residual_error_tmp=} {tolerance=}")
+    F_cycle_FAS(x, b, param)
+    residual_error_tmp = residual_error(x, b, h, param)
+    logging.info(f"{residual_error_tmp=} {tolerance=}")
     F_cycle_FAS(x, b, param)
     residual_error_tmp = residual_error(x, b, h, param)
     logging.info(f"{residual_error_tmp=} {tolerance=}")
@@ -602,7 +608,7 @@ def V_cycle_FAS(
     b_c = 0
     utils.add_vector_scalar_inplace(x_corr_c, x_c, np.float32(-1))
     x_c = 0
-    mesh.add_prolongation_half(x, x_corr_c)
+    mesh.add_prolongation(x, x_corr_c)
     x_corr_c = 0
     smoothing(x, b, h, param["Npost"], param, rhs)
 
